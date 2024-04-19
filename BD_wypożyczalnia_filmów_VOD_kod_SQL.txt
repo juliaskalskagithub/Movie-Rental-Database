@@ -1,0 +1,594 @@
+
+CREATE TABLE a_f (
+    aktorzy_id_aktora      INTEGER NOT NULL,
+    filmy_i_seriale_id_f_s INTEGER NOT NULL
+);
+
+ALTER TABLE a_f ADD CONSTRAINT a_f_pk PRIMARY KEY ( aktorzy_id_aktora,
+                                                    filmy_i_seriale_id_f_s );
+
+CREATE TABLE administrator (
+    id_administratora  INTEGER NOT NULL,
+    imie               VARCHAR2(40 CHAR),
+    nazwisko           VARCHAR2(80 CHAR),
+    nr_telefonu        INTEGER,
+    email              VARCHAR2(80 CHAR),
+    adres_kod_pocztowy VARCHAR2(50 CHAR) NOT NULL,
+    ulica              VARCHAR2(30 CHAR)
+);
+
+ALTER TABLE administrator ADD CONSTRAINT administrator_pk PRIMARY KEY ( id_administratora );
+
+CREATE TABLE adres (
+    kod_pocztowy VARCHAR2(50 CHAR) NOT NULL,
+    miejscowosc  VARCHAR2(30 CHAR),
+    wojewodztwo  VARCHAR2(30 CHAR)
+);
+
+ALTER TABLE adres ADD CONSTRAINT adres_pk PRIMARY KEY ( kod_pocztowy );
+
+CREATE TABLE aktorzy (
+    id_aktora        INTEGER NOT NULL,
+    imie             VARCHAR2(40 CHAR),
+    nazwisko         VARCHAR2(80 CHAR),
+    wiek             INTEGER,
+    kraj_pochodzenia VARCHAR2(80 CHAR)
+);
+
+ALTER TABLE aktorzy ADD CONSTRAINT aktorzy_pk PRIMARY KEY ( id_aktora );
+
+CREATE TABLE f_r (
+    filmy_i_seriale_id_f_s INTEGER NOT NULL,
+    rezyser_id_rezysera    INTEGER NOT NULL
+);
+
+ALTER TABLE f_r ADD CONSTRAINT f_r_pk PRIMARY KEY ( filmy_i_seriale_id_f_s,
+                                                    rezyser_id_rezysera );
+
+CREATE TABLE filmy_i_seriale (
+    id_f_s                   INTEGER NOT NULL,
+    tytul                    VARCHAR2(60 CHAR),
+    opis                     VARCHAR2(1000 CHAR),
+    cena                     INTEGER,
+    gatunek_id_gatunku       INTEGER NOT NULL,
+    typ_filmu_i_serialu_id_t INTEGER NOT NULL,
+    kraj_produkcji_id_kraju  INTEGER NOT NULL,
+    administrator_id_a       INTEGER NOT NULL,
+    pakiety_id_pakietu       INTEGER NOT NULL
+);
+
+ALTER TABLE filmy_i_seriale ADD CONSTRAINT filmy_i_seriale_pk PRIMARY KEY ( id_f_s );
+
+CREATE TABLE gatunek (
+    id_gatunku INTEGER NOT NULL,
+    nazwa      VARCHAR2(100 CHAR)
+);
+
+ALTER TABLE gatunek ADD CONSTRAINT gatunek_pk PRIMARY KEY ( id_gatunku );
+
+CREATE TABLE klient (
+    id_klienta         INTEGER NOT NULL,
+    imie               VARCHAR2(40 CHAR),
+    nazwisko           VARCHAR2(80 CHAR),
+    wiek               INTEGER,
+    nr_telefonu        INTEGER,
+    email              VARCHAR2(50 CHAR),
+    ulica              VARCHAR2(30 CHAR),
+    adres_kod_pocztowy VARCHAR2(50 CHAR) NOT NULL
+);
+
+ALTER TABLE klient ADD CONSTRAINT klient_pk PRIMARY KEY ( id_klienta );
+
+CREATE TABLE kraj_produkcji (
+    id_kraju INTEGER NOT NULL,
+    nazwa    VARCHAR2(80 CHAR)
+);
+
+ALTER TABLE kraj_produkcji ADD CONSTRAINT kraj_produkcji_pk PRIMARY KEY ( id_kraju );
+
+CREATE TABLE pakiety (
+    id_pakietu INTEGER NOT NULL,
+    nazwa      VARCHAR2(40 CHAR),
+    cena       INTEGER
+);
+
+ALTER TABLE pakiety ADD CONSTRAINT pakiety_pk PRIMARY KEY ( id_pakietu );
+
+CREATE TABLE recenzja_filmu_i_serialu (
+    id_recenzji            INTEGER NOT NULL,
+    opis                   VARCHAR2(1000 CHAR),
+    klient_id_klienta      INTEGER,
+    filmy_i_seriale_id_f_s INTEGER,
+    ocena                  INTEGER,
+    data_recenzji          DATE
+);
+
+ALTER TABLE recenzja_filmu_i_serialu ADD CONSTRAINT recenzja_filmu_i_serialu_pk PRIMARY KEY ( id_recenzji );
+
+CREATE TABLE rezyser (
+    id_rezysera      INTEGER NOT NULL,
+    imie             VARCHAR2(40 CHAR),
+    nazwisko         VARCHAR2(80 CHAR),
+    wiek             INTEGER,
+    kraj_pochodzenia VARCHAR2(80 CHAR)
+);
+
+ALTER TABLE rezyser ADD CONSTRAINT rezyser_pk PRIMARY KEY ( id_rezysera );
+
+CREATE TABLE rodzaj_platnosci (
+    id_platnosci INTEGER NOT NULL,
+    rodzaj       VARCHAR2(30 CHAR)
+);
+
+ALTER TABLE rodzaj_platnosci ADD CONSTRAINT rodzaj_platnosci_pk PRIMARY KEY ( id_platnosci );
+
+CREATE TABLE transakcje (
+    id_transakcji     INTEGER NOT NULL,
+    umowy_id_umowy    INTEGER,
+    wypozyczenia_id_w INTEGER
+);
+
+CREATE UNIQUE INDEX transakcje__idx ON
+    transakcje (
+        umowy_id_umowy
+    ASC );
+
+CREATE UNIQUE INDEX transakcje__idxv1 ON
+    transakcje (
+        wypozyczenia_id_w
+    ASC );
+
+ALTER TABLE transakcje ADD CONSTRAINT transakcje_pk PRIMARY KEY ( id_transakcji );
+
+CREATE TABLE typ_filmu_i_serialu (
+    id_typow INTEGER NOT NULL,
+    nazwa    VARCHAR2(80 CHAR)
+);
+
+ALTER TABLE typ_filmu_i_serialu ADD CONSTRAINT typ_filmu_i_serialu_pk PRIMARY KEY ( id_typow );
+
+CREATE TABLE umowy (
+    id_umowy              INTEGER NOT NULL,
+    klient_id_klienta     INTEGER NOT NULL,
+    administrator_id_a    INTEGER NOT NULL,
+    data_zawarcia_umowy   DATE,
+    kwota_koncowa         INTEGER,
+    pakiety_id_pakietu    INTEGER NOT NULL,
+    rodzaj_platnosci_id_p INTEGER NOT NULL
+);
+
+CREATE UNIQUE INDEX umowy__idx ON
+    umowy (
+        klient_id_klienta
+    ASC );
+
+ALTER TABLE umowy ADD CONSTRAINT umowy_pk PRIMARY KEY ( id_umowy );
+
+CREATE TABLE wypozyczenia (
+    id_wypozyczenia        INTEGER NOT NULL,
+    klient_id_klienta      INTEGER NOT NULL,
+    administrator_id_ad    INTEGER NOT NULL,
+    filmy_i_seriale_id_f_s INTEGER NOT NULL,
+    data_wypozyczenia      DATE,
+    kwota_koncowa          INTEGER,
+    rodzaj_platnosci_id_p  INTEGER NOT NULL
+);
+
+ALTER TABLE wypozyczenia ADD CONSTRAINT wypozyczenia_pk PRIMARY KEY ( id_wypozyczenia );
+
+ALTER TABLE a_f
+    ADD CONSTRAINT a_f_aktorzy_fk FOREIGN KEY ( aktorzy_id_aktora )
+        REFERENCES aktorzy ( id_aktora );
+
+ALTER TABLE a_f
+    ADD CONSTRAINT a_f_filmy_i_seriale_fk FOREIGN KEY ( filmy_i_seriale_id_f_s )
+        REFERENCES filmy_i_seriale ( id_f_s );
+
+ALTER TABLE administrator
+    ADD CONSTRAINT administrator_a_fk FOREIGN KEY ( adres_kod_pocztowy )
+        REFERENCES adres ( kod_pocztowy );
+
+ALTER TABLE f_r
+    ADD CONSTRAINT f_r_filmy_i_seriale_fk FOREIGN KEY ( filmy_i_seriale_id_f_s )
+        REFERENCES filmy_i_seriale ( id_f_s );
+
+ALTER TABLE f_r
+    ADD CONSTRAINT f_r_rezyser_fk FOREIGN KEY ( rezyser_id_rezysera )
+        REFERENCES rezyser ( id_rezysera );
+
+ALTER TABLE filmy_i_seriale
+    ADD CONSTRAINT filmy_i_seriale_a_fk FOREIGN KEY ( administrator_id_a )
+        REFERENCES administrator ( id_administratora );
+
+ALTER TABLE filmy_i_seriale
+    ADD CONSTRAINT filmy_i_seriale_g_fk FOREIGN KEY ( gatunek_id_gatunku )
+        REFERENCES gatunek ( id_gatunku );
+
+ALTER TABLE filmy_i_seriale
+    ADD CONSTRAINT filmy_i_seriale_kp_fk FOREIGN KEY ( kraj_produkcji_id_kraju )
+        REFERENCES kraj_produkcji ( id_kraju );
+
+ALTER TABLE filmy_i_seriale
+    ADD CONSTRAINT filmy_i_seriale_p_fk FOREIGN KEY ( pakiety_id_pakietu )
+        REFERENCES pakiety ( id_pakietu );
+
+ALTER TABLE filmy_i_seriale
+    ADD CONSTRAINT filmy_i_seriale_t_fk FOREIGN KEY ( typ_filmu_i_serialu_id_t )
+        REFERENCES typ_filmu_i_serialu ( id_typow );
+
+ALTER TABLE klient
+    ADD CONSTRAINT klient_adres_fk FOREIGN KEY ( adres_kod_pocztowy )
+        REFERENCES adres ( kod_pocztowy );
+
+ALTER TABLE recenzja_filmu_i_serialu
+    ADD CONSTRAINT recenzja_f_s_fk FOREIGN KEY ( filmy_i_seriale_id_f_s )
+        REFERENCES filmy_i_seriale ( id_f_s );
+
+ALTER TABLE recenzja_filmu_i_serialu
+    ADD CONSTRAINT recenzja_f_s_k_fk FOREIGN KEY ( klient_id_klienta )
+        REFERENCES klient ( id_klienta );
+
+ALTER TABLE transakcje
+    ADD CONSTRAINT transakcje_u_fk FOREIGN KEY ( umowy_id_umowy )
+        REFERENCES umowy ( id_umowy );
+
+ALTER TABLE transakcje
+    ADD CONSTRAINT transakcje_w_fk FOREIGN KEY ( wypozyczenia_id_w )
+        REFERENCES wypozyczenia ( id_wypozyczenia );
+
+ALTER TABLE umowy
+    ADD CONSTRAINT umowy_administrator_fk FOREIGN KEY ( administrator_id_a )
+        REFERENCES administrator ( id_administratora );
+
+ALTER TABLE umowy
+    ADD CONSTRAINT umowy_klient_fk FOREIGN KEY ( klient_id_klienta )
+        REFERENCES klient ( id_klienta );
+
+ALTER TABLE umowy
+    ADD CONSTRAINT umowy_pakiety_fk FOREIGN KEY ( pakiety_id_pakietu )
+        REFERENCES pakiety ( id_pakietu );
+
+ALTER TABLE umowy
+    ADD CONSTRAINT umowy_rodzaj_p_fk FOREIGN KEY ( rodzaj_platnosci_id_p )
+        REFERENCES rodzaj_platnosci ( id_platnosci );
+
+ALTER TABLE wypozyczenia
+    ADD CONSTRAINT wypozyczenia_ad_fk FOREIGN KEY ( administrator_id_ad )
+        REFERENCES administrator ( id_administratora );
+
+ALTER TABLE wypozyczenia
+    ADD CONSTRAINT wypozyczenia_f_s_fk FOREIGN KEY ( filmy_i_seriale_id_f_s )
+        REFERENCES filmy_i_seriale ( id_f_s );
+
+ALTER TABLE wypozyczenia
+    ADD CONSTRAINT wypozyczenia_klient_fk FOREIGN KEY ( klient_id_klienta )
+        REFERENCES klient ( id_klienta );
+
+ALTER TABLE wypozyczenia
+    ADD CONSTRAINT wypozyczenia_rp_fk FOREIGN KEY ( rodzaj_platnosci_id_p )
+        REFERENCES rodzaj_platnosci ( id_platnosci );
+
+
+
+
+
+/* aktorzy */
+CREATE SEQUENCE dept_deptidaktorzy_seq;
+BEGIN
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Joaquin','Phoenix','48','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Jack','Nicholson','85','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Leonardo','DiCaprio','48','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Al','Pacino','82','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Clint','Eastwood','92','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Anthony','Hopkins','84','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Daniel','Day-Lewis','65','Wielka Brytania');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Robert','Downey Jr.','57','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Joe','Pesci','79','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Will','Smith','54','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Tom','Hiddleston','41','Wielka Brytania');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Tom','Hanks','66','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Edward','Norton','53','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Johnny','Depp','59','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Christoph','Waltz','66','Austria');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Tom','Hardy','45','Wielka Brytania');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Brad','Pitt','58','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Hugh','Jackman','54','Australia');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Jake','Gyllenhaal','41','USA');
+INSERT INTO aktorzy VALUES (dept_deptidaktorzy_seq.NEXTVAL,'Cillian','Murphy','46','Irlandia');
+END;
+
+/* kraj produkcji */
+BEGIN
+INSERT INTO kraj_produkcji VALUES ('1','Polska');
+INSERT INTO kraj_produkcji VALUES ('2','Niemcy');
+INSERT INTO kraj_produkcji VALUES ('3','Francja');
+INSERT INTO kraj_produkcji VALUES ('4','Wielka Brytania');
+INSERT INTO kraj_produkcji VALUES ('5','Hiszpania');
+INSERT INTO kraj_produkcji VALUES ('6','USA');
+INSERT INTO kraj_produkcji VALUES ('7','Rosja');
+INSERT INTO kraj_produkcji VALUES ('8','Finlandia');
+INSERT INTO kraj_produkcji VALUES ('9','Portugalia');
+INSERT INTO kraj_produkcji VALUES ('10','Turcja');
+INSERT INTO kraj_produkcji VALUES ('11','Nowa Zelandia');
+INSERT INTO kraj_produkcji VALUES ('12','Szwajcaria');
+END;
+
+/* adres */
+begin 
+insert into adres values ('33-230', 'Rzeszow', 'Podkarpackie' );
+insert into adres values ('33-231', 'Krakow', 'Malopolskie' );
+insert into adres values ('33-232', 'Warszawa', 'Mazowieckie' );
+insert into adres values ('33-233', 'Gdansk', 'Podkarpackie' );
+insert into adres values ('33-234', 'Katowice', 'Slaskie' );
+insert into adres values ('33-235', 'Kielce', 'Swietokrzyskie' );
+end;
+
+/* administrator */
+begin
+INSERT INTO administrator VALUES ('1', 'Piotr', 'Pajda', '587567457', 'ppajda@onet.pl', '33-230', 'Szkolna');
+INSERT INTO administrator VALUES ('2', 'Joanna', 'Mazur', '765887658', 'jmazur@wp.pl', '33-231', 'Promienna');
+end;
+
+/* rezyser */
+CREATE SEQUENCE dept_deptidrezyser_seq;
+BEGIN
+INSERT INTO rezyser VALUES (dept_deptidrezyser_seq.NEXTVAL, 'Stanley', 'Kubrick', 54, 'Stany Zjednoczone'  );
+INSERT INTO rezyser VALUES (dept_deptidrezyser_seq.NEXTVAL, 'James', 'Cameron', 58, 'Kanada');
+INSERT INTO rezyser VALUES (dept_deptidrezyser_seq.NEXTVAL, 'Jerzy', 'Hoffman', 90, 'Polska');
+INSERT INTO rezyser VALUES (dept_deptidrezyser_seq.NEXTVAL, 'Quentin', 'Tarantino', 59, 'Stany Zjednoczone');
+INSERT INTO rezyser VALUES (dept_deptidrezyser_seq.NEXTVAL, 'Wes', 'Anderson', 53, 'Stany Zjednoczone');
+END;
+
+
+/* recenzja */
+BEGIN
+INSERT INTO recenzja_filmu_i_serialu VALUES ('1', 'Polecam', '2', '1', '4', '28-DEC-22');
+INSERT INTO recenzja_filmu_i_serialu VALUES ('2', 'Bardzo fakny film', '5', '3', '5', '26-DEC-22');
+INSERT INTO recenzja_filmu_i_serialu VALUES ('3', 'Super!!', '2', '3', '4', '12-DEC-22');
+INSERT INTO recenzja_filmu_i_serialu VALUES ('4', 'Tragedia', '1', '1', '2', '10-NOV-22');
+INSERT INTO recenzja_filmu_i_serialu VALUES ('5', 'Swietnie', '3', '1', '5', '17-DEC-22');
+INSERT INTO recenzja_filmu_i_serialu VALUES ('6', 'Okropne', '10', '2', '1', '13-NOV-22');
+END;
+
+/* klienci */
+CREATE SEQUENCE dept_deptid_seq;
+BEGIN
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Jan', 'Kowlaski', 19, '517928516', 'jkowalski@onet', 'Urocza', '33-230' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Piotr', 'Kawka', 19, '516753851', 'pkawka@onet', 'Solna', '33-232' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Jadwiga', 'Nowak', 19, '587626881', 'jnowak@onet', 'Wielkopolska', '33-231' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Zuzanna', 'Kijek', 33, '501693279', 'zkijek@onet', 'Partyzantow', '33-235' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Klaudia', 'Hula', 25, '719465578', 'khula@onet', 'Podkarpacka', '33-233' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Waldemar', 'Sroka', 42, '798587436', 'wsroka@onet', 'Ptasia', '33-231' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Pawel', 'Nicpon', 28, '587469875', 'pnicpona@onet', 'Mila', '33-232' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Aleksandra', 'Mila', 17, '953678731', 'amila@onet', 'Wesola', '33-230' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Marcin', 'Ziolko', 31, '467987656', 'mzilko@onet', 'Weteranow', '33-234' );
+INSERT INTO klient VALUES (dept_deptid_seq.NEXTVAL, 'Anna', 'Wesolowska', 39, '678876876', 'awesolowska@onet', 'Sadowa', '33-230' );
+END;
+
+/*typ filmu*/
+BEGIN
+INSERT INTO typ_filmu_i_serialu VALUES ('1','Premiera');
+INSERT INTO typ_filmu_i_serialu VALUES ('2','Nowość');
+INSERT INTO typ_filmu_i_serialu VALUES ('3','Standard');
+INSERT INTO typ_filmu_i_serialu VALUES ('4','Klasyk');
+END;
+
+/*gatunek*/
+BEGIN
+INSERT INTO gatunek VALUES ('1','Horror');
+INSERT INTO gatunek VALUES ('2','Akcji');
+INSERT INTO gatunek VALUES ('3','Western');
+INSERT INTO gatunek VALUES ('4','Animowany');
+INSERT INTO gatunek VALUES ('5','Komedia');
+INSERT INTO gatunek VALUES ('6','Romantyczny');
+INSERT INTO gatunek VALUES ('7','Dramat');
+INSERT INTO gatunek VALUES ('8','Fabularny');
+INSERT INTO gatunek VALUES ('9','Fantasy');
+INSERT INTO gatunek VALUES ('10','Komedia romantyczna');
+INSERT INTO gatunek VALUES ('11','Kryminalny');
+INSERT INTO gatunek VALUES ('12','Przygodowy');
+END;
+
+/*pakiety*/
+BEGIN
+INSERT INTO pakiety VALUES ('1','Premium','60');
+INSERT INTO pakiety VALUES ('2','Gold','40');
+INSERT INTO pakiety VALUES ('3','Standard','20');
+END; 
+
+/* filmy i seriale */
+begin
+insert into filmy_i_seriale values('1','Skazanie na Shawkshank',
+'Adaptacja opowiadania Stephena Kinga. 
+Niesłusznie skazany na dożywocie bankier, 
+stara się przetrwać w brutalnym, więziennym świecie.',
+20,'7','4','6','2','3');
+insert into filmy_i_seriale values('2','Nietykalni',
+'Sparaliżowany milioner zatrudnia do opieki młodego 
+chłopaka z przedmieścia, który właśnie wyszedł z więzienia.',
+20,'7','4','3','2','2');
+insert into filmy_i_seriale values('3','Avatar: Istota wody',
+'Pandorę znów napada wroga korporacja w poszukiwaniu cennych minerałów.
+Jack i Neytiri wraz z rodziną zmuszeni są opuścić wioskę i 
+szukać pomocy u innych plemion zamieszkujących planetę.',30,'9','1','6','1','1');
+insert into filmy_i_seriale values('4','Usmiechnij sie','Po tym, 
+jak dr Rose Carter bierze udział w traumatycznym zdarzeniu z udziałem pacjentki,
+wokół niej zaczynają dziać się niewytłumaczalne rzeczy',30,'1','1','6','1','1');
+end;
+
+/* RODZAJ PLATNOSCI */
+begin 
+insert into rodzaj_platnosci values ('1', 'blik'); 
+insert into rodzaj_platnosci values ('2', 'karta'); 
+insert into rodzaj_platnosci values ('3', 'przelew');
+end;
+
+
+/* umowy */
+begin
+insert into umowy values('1','1','1','28-DEC-22',60,'1','1');
+insert into umowy values('2','5','2','12-JAN-22',60,'1','1');
+insert into umowy values('3','8','1','19-FEB-22',20,'3','2');
+insert into umowy values('4','9','2','28-jan-22',60,'1','3');
+insert into umowy values('5','4','2','14-DEC-22',60,'1','1');
+insert into umowy values('6','10','2','10-JUL-22',20,'3','2');
+insert into umowy values('7','7','1','28-MAR-20',40,'2','3');
+insert into umowy values('8','6','1','01-APR-20',60,'1','2');
+end;
+
+/* WYPOZYCZENIA */
+begin
+insert into wypozyczenia values('1','1','1','1','28-DEC-22',20,'1');
+insert into wypozyczenia values('2','5','2','3','12-JAN-22',30,'1');
+insert into wypozyczenia values('3','8','1','2','19-FEB-22',20,'2');
+insert into wypozyczenia values('4','9','2','3','28-jan-22',30,'3');
+insert into wypozyczenia values('5','4','2','4','14-DEC-22',30,'1');
+insert into wypozyczenia values('6','10','2','4','10-JUL-22',30,'2');
+insert into wypozyczenia values('7','7','1','4','28-MAR-20',30,'3');
+insert into wypozyczenia values('8','6','1','1','01-APR-20',20,'2');
+insert into wypozyczenia values('9','6','1','1','01-APR-20',20,'2');
+end;
+
+/* obsady aktorskie */
+begin
+insert into a_f values('1','1');
+insert into a_f values('1','2');
+insert into a_f values('1','3');
+insert into a_f values('3','1');
+insert into a_f values('5','2');
+insert into a_f values('19','2');
+insert into a_f values('20','1');
+insert into a_f values('8','4');
+insert into a_f values('10','4');
+insert into a_f values('4','4');
+insert into a_f values('17','4');
+insert into a_f values('12','3');
+insert into a_f values('13','2');
+insert into a_f values('11','3');
+insert into a_f values('4','3');
+insert into a_f values('14','2');
+insert into a_f values('12','1');
+end;
+
+/* obsady rezyserskie */
+begin
+insert into f_r values('1','1');
+insert into f_r values('2','2');
+insert into f_r values('3','1');
+insert into f_r values('4','1');
+insert into f_r values('1','5');
+insert into f_r values('2','4');
+end;
+
+/*transakcje*/
+CREATE SEQUENCE dept_deptidtransakcje_seq;
+begin
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'1','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'2','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','1');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'3','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','2');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'4','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'5','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'6','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','3');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'7','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','4');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'8','');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','5');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','6');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','7');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','8');
+insert into transakcje values(dept_deptidtransakcje_seq.NEXTVAL,'','9');
+end;
+
+
+
+/*kwerenda 1 wiek klienta >19*/
+SELECT * FROM klient
+WHERE wiek > 19;
+
+/*kwerenda 2 wyswietlanie mezczyzn*/
+SELECT * FROM klient
+WHERE imie not like '%a'
+ORDER BY imie asc;
+
+/*kwerenda 3*/
+SELECT filmy_i_seriale.id_f_s, filmy_i_seriale.tytul, filmy_i_seriale.opis, kraj_produkcji.nazwa
+FROM filmy_i_seriale INNER JOIN kraj_produkcji ON 
+filmy_i_seriale.kraj_produkcji_id_kraju = kraj_produkcji.id_kraju
+WHERE kraj_produkcji.nazwa = 'USA';
+
+/*kwerenda 4*/
+SELECT * FROM filmy_i_seriale
+ORDER BY cena DESC;
+
+/*kwerenda 5*/
+SELECT klient.imie, klient.nazwisko, pakiety.nazwa as nazwa_pakietu
+FROM ((klient INNER JOIN umowy ON klient.id_klienta = umowy.klient_id_klienta)
+INNER JOIN pakiety ON umowy.pakiety_id_pakietu = pakiety.id_pakietu)
+WHERE pakiety.nazwa = 'Premium';
+
+/*kwerenda 6*/
+SELECT filmy_i_seriale.tytul, count(wypozyczenia.id_wypozyczenia) as liczba_wypozyczen
+FROM filmy_i_seriale INNER JOIN wypozyczenia ON
+filmy_i_seriale.id_f_s = wypozyczenia.filmy_i_seriale_id_f_s
+GROUP BY filmy_i_seriale.tytul;
+
+/*kwerenda 7*/
+SELECT * FROM umowy
+WHERE klient_id_klienta = '5';
+
+/*kwerenda 8*/
+SELECT filmy_i_seriale.tytul, typ_filmu_i_serialu.nazwa as status
+FROM filmy_i_seriale INNER JOIN typ_filmu_i_serialu ON
+filmy_i_seriale.typ_filmu_i_serialu_id_t = typ_filmu_i_serialu.id_typow
+
+/*kwerenda 9*/
+SELECT
+klient.id_klienta, count(wypozyczenia.id_wypozyczenia) as liczba_wypozyczen
+FROM klient INNER JOIN wypozyczenia ON klient.id_klienta = wypozyczenia.klient_id_klienta
+GROUP BY klient.id_klienta;
+
+/*kwerenda 10*/
+SELECT pakiety.nazwa, SUM(kwota_koncowa) as ZYSK 
+FROM umowy INNER JOIN pakiety ON umowy.pakiety_id_pakietu = pakiety.id_pakietu
+GROUP BY pakiety.nazwa
+
+/*kwerenda 11*/
+SELECT filmy_i_seriale.tytul ,SUM(kwota_koncowa) as ZYSK 
+FROM wypozyczenia INNER JOIN filmy_i_seriale ON wypozyczenia.filmy_i_seriale_id_f_s = filmy_i_seriale.id_f_s
+GROUP BY filmy_i_seriale.tytul
+
+/*kwerenda 12*/
+SELECT  klient.imie, filmy_i_seriale.tytul, recenzja_filmu_i_serialu.opis, recenzja_filmu_i_serialu.ocena, recenzja_filmu_i_serialu.data_recenzji 
+FROM ((recenzja_filmu_i_serialu INNER JOIN filmy_i_seriale 
+ON recenzja_filmu_i_serialu.filmy_i_seriale_id_f_s = filmy_i_seriale.id_f_s)
+INNER JOIN klient ON recenzja_filmu_i_serialu.klient_id_klienta = klient.id_klienta)
+WHERE recenzja_filmu_i_serialu.ocena > '3'
+
+/*kwerenda 13*/
+UPDATE filmy_i_seriale
+SET cena = cena + 5
+WHERE typ_filmu_i_serialu_id_t = '1';
+
+/*kwerenda 14*/
+SELECT tytul, cena
+FROM filmy_i_seriale
+WHERE cena BETWEEN 10 AND 30;
+
+/*kwerenda 15*/
+SELECT pakiety.nazwa, count(filmy_i_seriale.pakiety_id_pakietu) as ilosc_filmow
+FROM filmy_i_seriale INNER JOIN pakiety ON filmy_i_seriale.pakiety_id_pakietu = pakiety.id_pakietu
+GROUP BY pakiety.nazwa
+ORDER BY ilosc_filmow DESC;
+
+
+
+
+
+
+
+
+
+
